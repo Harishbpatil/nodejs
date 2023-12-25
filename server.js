@@ -1,41 +1,46 @@
 const http = require("http");
+const fs = require("fs");
 
 const server = http.createServer((req, res) => {
   const url = req.url;
+  const method = req.method;
+
   if (url === "/") {
     res.write("<html>");
-    res.write("<head><title>My First Page</title></head>");
-    res.write("<body><h1>Hello From My NodeJs Server!!</h1></body>");
+    res.write("<head><title>Enter Message</title></head>");
+
+    const message = fs.readFileSync("message.txt", "utf8");
+
+    res.write("<body>");
+
+    res.write("<p> " + message + "</p>");
+
+    res.write('<form action="/message" method="POST">');
+    res.write('<input type="text" name="message" value="' + message + '">');
+    res.write('<button type="submit">Send</button>');
+    res.write("</form>");
+
+    res.write("</body>");
     res.write("</html>");
-    res.end();
-    return;
+
+    return res.end();
   }
 
-  if (url === "/home") {
-    res.write("<html>");
-    res.write("<head><title>My First Page</title></head>");
-    res.write("<body><h1>Welcome to my Home!!</h1></body>");
-    res.write("</html>");
-    res.end();
-    return;
-  }
+  if (url === "/message" && method === "POST") {
+    const body = [];
+    req.on("data", (chunk) => {
+      console.log(chunk);
+      body.push(chunk);
+    });
+    req.on("end", () => {
+      const parsedBody = Buffer.concat(body).toString();
+      const message = parsedBody.split("=")[1];
+      fs.writeFileSync("message.txt", message);
 
-  if (url === "/about") {
-    res.write("<html>");
-    res.write("<head><title>My First Page</title></head>");
-    res.write("<body><h1>Welcome to About us Page!!</h1></body>");
-    res.write("</html>");
-    res.end();
-    return;
-  }
-
-  if (url === "/node") {
-    res.write("<html>");
-    res.write("<head><title>My First Page</title></head>");
-    res.write("<body><h1>Welcome to my NodeJs Project!!</h1></body>");
-    res.write("</html>");
-    res.end();
-    return;
+      res.statusCode = 302;
+      res.setHeader("Location", "/");
+      return res.end();
+    });
   }
 });
 
