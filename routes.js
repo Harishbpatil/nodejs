@@ -8,13 +8,14 @@ const requestHandler = (req, res) => {
       }
 
       let result =
-        "<html><head><title>Harish</title></head>" +
+        "<html><head><title>Harish Patil</title></head>" +
         "<body><p>" +
         data +
         '<form action="/message" method="POST"><input type="text" name="message"/> <button type="submit" >send</button> </form></body></html>';
       return res.end(result);
     });
   }
+
   if (req.url === "/message" && req.method === "POST") {
     const body = [];
     req.on("data", (chunk) => {
@@ -34,14 +35,3 @@ const requestHandler = (req, res) => {
 };
 
 module.exports = requestHandler;
-
-// module.exports.requestHandler;
-// module.exports.someText='some hard coded text';
-
-// exports.requestHandler;
-// exports.someText='some hard coded text';
-
-// module.exports={
-//     handler:requestHandler,
-//     someText:"some"
-// }
